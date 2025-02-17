@@ -1,20 +1,31 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const ai = require("./ai");
+const path = require("path");
+const { findBestMatch } = require("./ai"); // Import AI logic
 
 const app = express();
+const PORT = 3000;
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
+app.use("/fonts", express.static(path.join(__dirname, "fonts")));
 
+// API Endpoint for AI Responses
 app.post("/ask", (req, res) => {
-    const question = req.body.question;
-    const answer = ai.generateResponse(question);
-    res.json({ answer });
+    const userQuestion = req.body.question;
+    if (!userQuestion) {
+        return res.status(400).json({ answer: "Please ask a question." });
+    }
+
+    // Get AI-generated response
+    const aiResponse = findBestMatch(userQuestion);
+    res.json({ answer: aiResponse });
 });
 
-const PORT = 3000;
+// Start Server
 app.listen(PORT, () => {
-    console.log(`VELOS AI Server running at http://localhost:${PORT}`);
+    console.log(`VELOS AI server running at http://localhost:${PORT}`);
 });
