@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const darkModeButton = document.getElementById("dark-mode-toggle");
     const reloadButton = document.getElementById("reload-chat");
 
-    // Handle enter key press
+    // Handle Enter key press for sending messages
     inputField.addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
             sendMessage();
@@ -16,21 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.toggle("light-mode");
     });
 
-    // Reload chat
+    // Reload chat (clear messages)
     reloadButton.addEventListener("click", () => {
         chatBox.innerHTML = ""; // Clears chat messages
     });
 });
 
-// Function to send message
+// Function to send messages
 async function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
     if (!userInput) return;
 
     const chatBox = document.getElementById("chat-box");
 
-    // Display user message in a box
-    chatBox.innerHTML += `<div class="chat-box user-box"><strong>User:</strong> <span>${userInput}</span></div>`;
+    // Display user message
+    chatBox.innerHTML += `<div class="message user-message"><strong>User:</strong> <span>${userInput}</span></div>`;
     document.getElementById("user-input").value = "";
 
     // Scroll chat box to the bottom
@@ -45,8 +45,8 @@ async function sendMessage() {
 
         const result = await response.json();
 
-        // Simulate AI typing effect (100 words per second)
-        let aiMessage = `<div class="chat-box ai-box"><strong>VELOS AI:</strong> <span id="ai-message"></span></div>`;
+        // AI typing effect (100 words per second)
+        let aiMessage = `<div class="message ai-message"><strong>VELOS AI:</strong> <span id="ai-message"></span></div>`;
         chatBox.innerHTML += aiMessage;
         chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -65,6 +65,6 @@ async function sendMessage() {
         typeWord();
     } catch (error) {
         console.error("Error fetching AI response:", error);
-        chatBox.innerHTML += `<div class="chat-box error-box"><strong>VELOS AI:</strong> Oops! Something went wrong.</div>`;
+        chatBox.innerHTML += `<div class="message error-message"><strong>VELOS AI:</strong> Oops! Something went wrong.</div>`;
     }
 }
