@@ -49,12 +49,13 @@ async function sendMessage() {
         // Simulated AI typing effect (100 words per second)
         let words = result.answer.split(" ");
         let index = 0;
+        let chunkSize = 10; // AI types in 10-word chunks per second
 
         function typeWords() {
             if (index < words.length) {
-                messageContainer.innerHTML += words[index] + " ";
-                index++;
-                setTimeout(typeWords, 10); // Adjusted for 100 words per second
+                messageContainer.innerHTML += words.slice(index, index + chunkSize).join(" ") + " ";
+                index += chunkSize;
+                setTimeout(typeWords, 1000); // Adjusted for 100 words per second
             }
         }
 
