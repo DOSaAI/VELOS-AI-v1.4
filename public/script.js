@@ -1,32 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
     const inputField = document.getElementById("user-input");
     const chatBox = document.getElementById("chat-box");
-    const darkModeButton = document.getElementById("dark-mode-toggle");
-    const reloadButton = document.getElementById("reload-chat");
 
+    // Handle Enter key press for sending messages
     inputField.addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
             sendMessage();
         }
     });
-
-    darkModeButton.addEventListener("click", () => {
-        document.body.classList.toggle("light-mode");
-    });
-
-    reloadButton.addEventListener("click", () => {
-        chatBox.innerHTML = "";
-    });
 });
 
+// Function to send messages
 async function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
     if (!userInput) return;
 
     const chatBox = document.getElementById("chat-box");
 
-    chatBox.innerHTML += `<div class="message user-message"><strong>User:</strong> <span>${userInput}</span></div>`;
+    // Create user message container
+    const userMessage = document.createElement("div");
+    userMessage.classList.add("message", "user-message");
+    userMessage.innerHTML = `<strong>User:</strong> <span>${userInput}</span>`;
+    chatBox.appendChild(userMessage);
+
+    // Create AI response container directly after the user message
+    const aiMessageContainer = document.createElement("div");
+    aiMessageContainer.classList.add("message", "ai-message");
+    aiMessageContainer.innerHTML = `<strong>VELOS AI:</strong> <span id="ai-message-${Date.now()}"></span>`;
+    chatBox.appendChild(aiMessageContainer);
+
+    // Clear input field
     document.getElementById("user-input").value = "";
+
+    // Scroll to the new messages
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
@@ -37,26 +43,24 @@ async function sendMessage() {
         });
 
         const result = await response.json();
+        const aiMessageId = aiMessageContainer.querySelector("span").id;
+        let messageContainer = document.getElementById(aiMessageId);
 
-        let aiMessage = `<div class="message ai-message"><strong>VELOS AI:</strong> <span id="ai-message"></span></div>`;
-        chatBox.innerHTML += aiMessage;
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        let messageContainer = document.getElementById("ai-message");
+        // Simulated AI typing effect (100 words per second)
         let words = result.answer.split(" ");
         let index = 0;
 
-        function typeWord() {
+        function typeWords() {
             if (index < words.length) {
                 messageContainer.innerHTML += words[index] + " ";
                 index++;
-                setTimeout(typeWord, 100);
+                setTimeout(typeWords, 10); // Adjusted for 100 words per second
             }
         }
 
-        typeWord();
+        typeWords();
     } catch (error) {
         console.error("Error fetching AI response:", error);
-        chatBox.innerHTML += `<div class="message ai-message"><strong>VELOS AI:</strong> Oops! Something went wrong.</div>`;
+        aiMessageContainer.innerHTML = `<strong>VELOS AI:</strong> Oops! Something went wrong.`;
     }
 }
