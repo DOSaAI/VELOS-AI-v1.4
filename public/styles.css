@@ -16,20 +16,21 @@
 
 :root {
     --text-color: #FFFFFF;
-    --icon-color: #ACACBE;
-    --placeholder-color: #dcdcdc;
     --chat-bg: #343541;
     --user-message-bg: #007bff;
     --ai-message-bg: #444654;
     --border-color: #D9D9E3;
 }
 
+/* Body Styling */
 body {
     background: var(--chat-bg);
     color: var(--text-color);
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    justify-content: center;
 }
 
 /* Chat Container */
@@ -95,13 +96,7 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
-.typing-container .typing-content {
-    display: flex;
-    max-width: 950px;
-    width: 100%;
-    align-items: flex-end;
-}
-
+/* Text Input and Send Button */
 .typing-textarea {
     width: 100%;
     display: flex;
@@ -113,38 +108,40 @@ body {
     height: 55px;
     width: 100%;
     border: none;
-    padding: 15px 45px 15px 20px;
+    padding: 15px 60px 15px 20px;
     font-size: 1rem;
-    border-radius: 4px;
-    max-height: 250px;
-    overflow-y: auto;
+    border-radius: 25px;
     background: var(--ai-message-bg);
     outline: 1px solid var(--border-color);
     color: var(--text-color);
 }
 
 .typing-textarea textarea::placeholder {
-    color: var(--placeholder-color);
+    color: var(--text-color);
 }
 
-/* Typing Effect */
-.typing-animation {
-    padding-left: 10px;
-    display: inline-flex;
-}
-
-.typing-animation .typing-dot {
-    height: 7px;
-    width: 7px;
+/* Send Button */
+#send-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 45px;
+    height: 45px;
+    border: none;
+    background: #007bff;
+    color: white;
     border-radius: 50%;
-    margin: 0 3px;
-    opacity: 0.7;
-    background: var(--text-color);
-    animation: animateDots 1.5s infinite ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-@keyframes animateDots {
-    0%, 44% { transform: translateY(0px); }
-    28% { opacity: 0.4; transform: translateY(-6px); }
-    44% { opacity: 0.2; }
+#send-btn:hover {
+    background: #0056b3;
+}
+
+#send-btn span {
+    font-size: 24px;
 }
