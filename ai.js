@@ -1,67 +1,126 @@
 const fs = require("fs");
 
-// Load Q&A dataset
+// -------------------------
+// Load Q&A Dataset (qa.json)
+// -------------------------
+
 let qaDataset = [];
 try {
     const qaData = fs.readFileSync("qa.json", "utf8");
     qaDataset = JSON.parse(qaData);
-    console.log("Q&A dataset loaded.");
+    console.log("Q&A dataset loaded successfully.");
 } catch (err) {
-    console.error("Could not read qa.json. Ensure the file exists.");
+    console.error("Error: Could not load qa.json. Ensure the file exists.");
 }
 
-// ----------------------------
-// AI Response Generation Logic
-// ----------------------------
+// -------------------------
+// Levenshtein Distance (Fuzzy Matching)
+// -------------------------
 
-function generateResponse(userQuestion) {
-    const lowerCaseQuestion = userQuestion.toLowerCase();
-    let matchingAnswers = [];
+function levenshteinDistance(a, b) {
+    const matrix = [];
 
-    // Step 1: Collect all answers for similar questions
-    for (const entry of qaDataset) {
-        if (lowerCaseQuestion.includes(entry.question.toLowerCase())) {
-            matchingAnswers.push(entry.answer);
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    matrix[i][j - 1] + 1, // insertion
+                    matrix[i - 1][j] + 1 // deletion
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+// -------------------------
+// Markov-Based Prediction Model for Dynamic Responses
+// -------------------------
+
+function normalizeText(text) {
+    return text.toLowerCase().replace(/[^\w\s]/g, "").trim();
+}
+
+/**
+ * Builds a Markov chain model from the given text.
+ * Maps each word to possible next words.
+ */
+function buildMarkovModel(text) {
+    const words = text.split(/\s+/);
+    const model = {};
+
+    for (let i = 0; i < words.length - 1; i++) {
+        const word = words[i].toLowerCase();
+        const nextWord = words[i + 1].toLowerCase();
+
+        if (!model[word]) {
+            model[word] = [];
+        }
+        model[word].push(nextWord);
+    }
+
+    return model;
+}
+
+/**
+ * Generates a dynamic response using the Markov model.
+ */
+function generateDynamicResponse(baseResponse) {
+    const model = buildMarkovModel(baseResponse);
+    let words = baseResponse.split(/\s+/);
+    let response = [words[0]];
+
+    for (let i = 1; i < words.length; i++) {
+        const lastWord = response[response.length - 1].toLowerCase();
+        if (model[lastWord]) {
+            const nextWords = model[lastWord];
+            response.push(nextWords[Math.floor(Math.random() * nextWords.length)]);
+        } else {
+            break;
         }
     }
 
-    // Step 2: If no match, return default response
-    if (matchingAnswers.length === 0) {
-        return "I'm not sure. Can you rephrase your question?";
-    }
-
-    // Step 3: Use word prediction model to generate a response
-    return predictResponse(matchingAnswers);
+    return response.join(" ") + ".";
 }
 
-// ----------------------------
-// Word Prediction Model (Markov-like)
-// ----------------------------
+// -------------------------
+// Find Best Answer with Dynamic Variation
+// -------------------------
 
-function predictResponse(answers) {
-    let words = [];
-    
-    // Collect words from all possible answers
-    answers.forEach(answer => {
-        words = words.concat(answer.split(/\s+/));
-    });
+function findBestMatch(userInput) {
+    const normalizedInput = normalizeText(userInput);
+    let bestMatch = null;
+    let bestScore = Infinity;
 
-    // If no words are collected, return a random fallback answer
-    if (words.length === 0) return "I don't have enough information.";
+    for (const pair of qaDataset) {
+        const normalizedQuestion = normalizeText(pair.question);
+        const distance = levenshteinDistance(normalizedInput, normalizedQuestion);
 
-    // Generate a response by predicting words dynamically
-    let response = [];
-    let currentWord = words[Math.floor(Math.random() * words.length)]; // Pick a random start word
-
-    for (let i = 0; i < 20; i++) { // Limit to 20 words max
-        response.push(currentWord);
-        let nextWords = words.filter((word, index) => words[index - 1] === currentWord); // Find possible next words
-        if (nextWords.length === 0) break; // Stop if no next words are found
-        currentWord = nextWords[Math.floor(Math.random() * nextWords.length)]; // Pick a random next word
+        if (distance < bestScore) {
+            bestScore = distance;
+            bestMatch = pair.answer;
+        }
     }
 
-    return response.join(" ") + "."; // Format the response
+    if (!bestMatch || bestScore > 3) {
+        return "I'm sorry, but I don't have enough data to answer that question.";
+    }
+
+    return generateDynamicResponse(bestMatch);
 }
 
-// Export AI function
-module.exports = { generateResponse };
+// -------------------------
+// Export AI Function
+// -------------------------
+
+module.exports = { findBestMatch };
