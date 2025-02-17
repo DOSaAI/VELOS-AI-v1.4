@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const path = require("path");
 const { findBestMatch } = require("./ai"); // Import AI logic
 
@@ -8,7 +7,6 @@ const app = express();
 const PORT = 3000;
 
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use("/fonts", express.static(path.join(__dirname, "fonts")));
@@ -20,7 +18,7 @@ app.post("/ask", (req, res) => {
         return res.status(400).json({ answer: "Please ask a question." });
     }
 
-    // Get AI-generated response
+    // Generate AI response
     const aiResponse = findBestMatch(userQuestion);
     res.json({ answer: aiResponse });
 });
