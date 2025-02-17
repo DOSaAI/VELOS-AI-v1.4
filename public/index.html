@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VELOS AI Chat</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Google Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
-    
+
     <!-- Chat Container -->
     <div class="chat-container">
         <div class="default-text">
@@ -17,7 +16,7 @@
             <p>Your intelligent chatbot assistant</p>
         </div>
         
-        <div class="chat-box" id="chat-box"></div>
+        <div id="chat-box" class="chat-box"></div>
     </div>
 
     <!-- Typing Area -->
@@ -28,8 +27,8 @@
                 <span class="material-icons" onclick="sendMessage()">send</span>
             </div>
             <div class="typing-controls">
-                <span class="material-icons">refresh</span>
-                <span class="material-icons">light_mode</span>
+                <span id="reload-chat" class="material-icons">refresh</span>
+                <span id="dark-mode-toggle" class="material-icons">light_mode</span>
             </div>
         </div>
     </div>
