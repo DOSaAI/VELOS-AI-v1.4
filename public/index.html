@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VELOS AI Chat</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
 
@@ -23,11 +22,9 @@
         <div class="typing-content">
             <div class="typing-textarea">
                 <textarea id="user-input" placeholder="Type your message..." required></textarea>
-                <span class="material-icons" onclick="sendMessage()">send</span>
-            </div>
-            <div class="typing-controls">
-                <span id="reload-chat" class="material-icons">refresh</span>
-                <span id="dark-mode-toggle" class="material-icons">light_mode</span>
+                <button id="send-btn" onclick="sendMessage()">
+                    <span class="material-icons">arrow_upward</span>
+                </button>
             </div>
         </div>
     </div>
